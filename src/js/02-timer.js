@@ -2,20 +2,20 @@ import flatpickr from 'flatpickr';
 // Dodatkowy import stylów
 import 'flatpickr/dist/flatpickr.min.css';
 //const flatpickr = require('flatpickr');
+import Notiflix from 'notiflix';
 
 //const inputEl = document.getElementById('datetime-picker');
 const btnEl = document.querySelector('button[type = "button"]');
+const daysItem = document.querySelector('span[data-days]');
+const hoursItem = document.querySelector('span[data-hours]');
+const minutesItem = document.querySelector('span[data-minutes]');
+const secondsItem = document.querySelector('span[data-seconds]');
+const valueId = document.querySelectorAll('.value');
+//console.log(valueId);
 
-// const options = {
-//   enableTime: true,
-//   time_24hr: true,
-//   defaultDate: new Date(),
-//   minuteIncrement: 1,
-//   onClose(selectedDates) {
-//     console.log(selectedDates[0]);
-//   },
-// };
-//btnEl.disabled = true;
+let timeLeft;
+let choosedDate;
+let timerId;
 
 const options = {
   enableTime: true,
@@ -23,62 +23,68 @@ const options = {
   defaultDate: new Date(),
   minuteIncrement: 1,
   onClose(selectedDates) {
-    const selectedDate = selectedDates[0];
-    if (selectedDate < new Date()) {
+    if (selectedDates[0] <= new Date()) {
       btnEl.disabled = true;
-      window.alert('Please choose a date in the future');
+      //window.alert('Please choose a date in the future');
+      Notiflix.Notify.failure('Please choose a date in the future');
     } else {
       btnEl.disabled = false;
+      choosedDate = selectedDates[0].getTime();
+      timeLeft = choosedDate - new Date();
+      Notiflix.Notify.success('OK');
     }
+    //console.log(choosedDate);
+    //console.log(timeLeft);
   },
 };
 
-// const options = {
-//   enableTime: true,
-//   time_24hr: true,
-//   defaultDate: new Date(),
-//   minuteIncrement: 1,
-//   onClose(selectedDates) {
-//     pickedDate = selectedDates[0].getTime();
-
-//     if (pickedDate < Date.parse(options.defaultDate)) {
-//       Notiflix.Notify.failure('Please choose a date in the future');
-//       btnEl.setAttribute('disabled', '');
-//     } else {
-//       btnEl.disabled = false;
-//     }
-//   },
-// };
-
-//function addLeadingZero(value) { }
+flatpickr('#datetime-picker', options);
 
 //funkcja, która zwraca obiekt z obliczonym pozostałym czasem do daty końcowej
-//parametr ms to różnica między końcową (wybraną) i aktualną datą w milisekundach.
-// function convertMs(ms) {
-//   // Number of milliseconds per unit of time
-//   const second = 1000;
-//   const minute = second * 60;
-//   const hour = minute * 60;
-//   const day = hour * 24;
+//parametr timeLeft to różnica między datą końcową (wybraną) i aktualną datą w milisekundach.
+function convertMs(timeLeft) {
+  // Number of milliseconds per unit of time
+  const second = 1000;
+  const minute = second * 60;
+  const hour = minute * 60;
+  const day = hour * 24;
+  // Remaining days
+  const days = Math.floor(timeLeft / day);
+  // Remaining hours
+  const hours = Math.floor((timeLeft % day) / hour);
+  // Remaining minutes
+  const minutes = Math.floor(((timeLeft % day) % hour) / minute);
+  // Remaining seconds
+  const seconds = Math.floor((((timeLeft % day) % hour) % minute) / second);
 
-//   // Remaining days
-//   const days = Math.floor(ms / day);
-//   // Remaining hours
-//   const hours = Math.floor((ms % day) / hour);
-//   // Remaining minutes
-//   const minutes = Math.floor(((ms % day) % hour) / minute);
-//   // Remaining seconds
-//   const seconds = Math.floor((((ms % day) % hour) % minute) / second);
+  return { days, hours, minutes, seconds };
+}
+//valueId.innerHTML = '22';
+//console.log(valueId);
 
-//   return { days, hours, minutes, seconds };
-// }
+function addLeadingZero(value) {
+  const formattedValue = value.toString().padStart(2, '0');
+  return formattedValue;
+}
 
-// console.log(convertMs(2000)); // {days: 0, hours: 0, minutes: 0, seconds: 2}
-// console.log(convertMs(140000)); // {days: 0, hours: 0, minutes: 2, seconds: 20}
-// console.log(convertMs(24140000)); // {days: 0, hours: 6 minutes: 42, seconds: 20}
+function getCounter() {
+  timerId = setInterval(() => {
+    timeLeft = choosedDate - new Date().getTime();
+    const { days, hours, minutes, seconds } = convertMs(timeLeft);
+    daysItem.innerHTML = addLeadingZero(days);
+    hoursItem.innerHTML = addLeadingZero(hours);
+    minutesItem.innerHTML = addLeadingZero(minutes);
+    secondsItem.innerHTML = addLeadingZero(seconds);
 
-flatpickr('input#datetime-picker', options);
-//flatpickr(inputEl, options);
-//function getCounter();
+    if (timeLeft < 0) {
+      clearInterval(timerId);
+      daysItem.innerHTML = '00';
+      hoursItem.innerHTML = '00';
+      minutesItem.innerHTML = '00';
+      secondsItem.innerHTML = '00';
+    }
+  }, 1000);
+}
+btnEl.addEventListener('click', getCounter);
 
-//btnEl.addEventListener('clikc', getCounter);
+//console.log(options.defaultDate.getTime());

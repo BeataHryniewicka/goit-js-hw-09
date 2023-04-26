@@ -16,3 +16,31 @@ img {
   display: block;
   max-width: 100%;
 }
+
+.timer {
+  display: flex;
+  gap: 20px;
+  margin-top: 200px;
+  flex-direction: column-reverse;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.value {
+  font-size: 25px;
+  font-weight: 600;
+  font-family: 'Courier New';
+  color: red;
+}
+
+.label {
+  text-transform: uppercase;
+  font-size: 20px;
+  text-align: center;
+  font-family: 'Courier New';
+  color: blue;
+}
