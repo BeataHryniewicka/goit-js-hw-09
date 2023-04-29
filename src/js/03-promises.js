@@ -9,6 +9,14 @@ formEl.addEventListener('submit', event => {
   const delayStep = parseInt(formData.get('step'));
   const amount = parseInt(formData.get('amount'));
 
+  // const delayEl = document.querySelector('input[name="delay"]');
+  // const stepEl = document.querySelector('input[name="step"]');
+  // const amountEl = document.queryselector('input[name="amount"]');
+
+  // const firstDelay = parseInt(delayEl.value);
+  // const delayStep = parseInt(stepEl.value);
+  // const amount = parseInt(amountEl.value);
+
   for (let i = 0; i < amount; i++)
     createPromise(i + 1, firstDelay + i * delayStep)
       .then(({ position, delay }) => {
